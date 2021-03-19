@@ -1,0 +1,9 @@
+FROM --platform=$TARGETPLATFORM alpine:3.13 as builder
+ARG TARGETPLATFORM
+RUN /bin/sh -c " \
+ wget -S -O /tmp/apiserver.tar.gz https://dl.k8s.io/v1.20.4/kubernetes-server-`printf "$TARGETPLATFORM" | tr '/' '-'`.tar.gz \
+"
+RUN tar -xvf /tmp/apiserver.tar.gz
+
+FROM --platform=$TARGETPLATFORM alpine:3.13
+COPY --from=builder /kubernetes/server/bin/kube-apiserver /usr/local/bin/kube-apiserver
