@@ -1,0 +1,4 @@
+FROM --platform=$BUILDPLATFORM alpine:3.13
+RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing etcd-ctl
+RUN apk add --no-cache python3 py3-pip
+RUN pip3 install awscli boto3 --upgrade
