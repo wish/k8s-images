@@ -1,0 +1,14 @@
+FROM --platform=$BUILDPLATFORM golang:1.15-alpine as builder
+
+WORKDIR /go/src/k8s.io/
+RUN wget -O /src.tar.gz https://github.com/kubernetes/kops/archive/v1.20.0-beta.1.tar.gz
+RUN tar -xvf /src.tar.gz -C /go/src/k8s.io/
+RUN mv * kops
+WORKDIR /go/src/k8s.io/kops
+RUN go build -v -o /bin/channels ./channels/cmd/channels/main.go
+
+FROM alpine:3.13
+RUN apk add --no-cache python3 py3-pip
+RUN pip3 install awscli boto3 --upgrade
+RUN wget -O /bin/kubectl https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl && chmod +x /bin/kubectl
+COPY --from=builder /bin/channels /bin/channels
